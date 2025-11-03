@@ -3,13 +3,7 @@ using OkErrorHandling
 
 @testset "@run_pipeline tests" begin
 
-    @testset "Interactive mode: errors propagate normally" begin
-        # In interactive mode (REPL), errors should throw normally
-        @test_throws ErrorException @run_pipeline error("test error")
-        @test_throws ArgumentError @run_pipeline throw(ArgumentError("bad arg"))
-    end
-
-    @testset "Interactive mode: successful execution" begin
+    @testset "Successful execution" begin
         # Should execute and return normally
         result = @run_pipeline begin
             x = 1 + 1
@@ -18,11 +12,26 @@ using OkErrorHandling
         @test result == 4
     end
 
-    @testset "Non-interactive mode simulation" begin
-        # Test behavior when isinteractive() returns false
-        # We need to spawn a separate Julia process to truly test CLI mode
+    @testset "Interactive mode: errors propagate" begin
+        # These tests verify that in interactive mode, errors throw normally
+        # We spawn Julia in interactive mode to test this behavior
 
-        # Test successful execution
+        interactive_error_script = """
+        using OkErrorHandling
+        using Test
+        @test_throws ErrorException @run_pipeline error("test error")
+        @test_throws ArgumentError @run_pipeline throw(ArgumentError("bad arg"))
+        println("TESTS_PASSED")
+        """
+        result = read(pipeline(`julia --startup-file=no -i -e $(interactive_error_script)`), String)
+        @test occursin("TESTS_PASSED", result)
+    end
+
+    @testset "Non-interactive mode: error handling" begin
+        # Test behavior when isinteractive() returns false
+        # We spawn separate Julia processes in non-interactive mode to test CLI behavior
+
+        # Test successful execution in non-interactive mode
         script = """
         using OkErrorHandling
         @run_pipeline begin
