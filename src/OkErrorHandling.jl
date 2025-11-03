@@ -36,8 +36,10 @@ macro run_pipeline(ex)
         if !isinteractive()
             # --- CLI Mode: Add the try...catch ---
             try
+                # `esc(ex)` execute the expression ex using the variables and functions from the caller's scope (where the macro was invoked).
                 $(esc(ex))
             catch e
+                # The following functions won't be escaped. They will always refer to the functions available to your `OkErrorHandling` module. Even if the user does something strange like `exit = "my-string"`, your macro's catch block will still call the real `Base.exit(1)` and work correctly.
                 println(stderr, "\n" * "="^80)
                 println(stderr, "❌ ERROR: Pipeline failed!")
                 println(stderr, "="^80 * "\n")
