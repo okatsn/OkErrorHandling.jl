@@ -11,6 +11,25 @@ Executes expression `ex`.
   On error, logs a formatted message and calls `exit(1)`.
 - In interactive (REPL) mode: Executes `ex` directly,
   allowing errors to throw normally for debugging.
+
+# Example
+```julia
+using OkErrorHandling
+
+function main()
+    error("Hello!")
+end
+
+if !isempty(PROGRAM_FILE) && abspath(PROGRAM_FILE) == @__FILE__
+    println("Running in CLI mode...")
+    @run_pipeline main()
+else
+    # --- INTERACTIVE EXECUTION (REPL/VSCode) ---
+    println("Running in REPL/interactive mode.")
+    @run_pipeline main()
+end
+```
+
 """
 macro run_pipeline(ex)
     quote
