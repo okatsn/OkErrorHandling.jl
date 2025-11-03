@@ -1,7 +1,7 @@
 name = "OkErrorHandling"
 uuid = "04975587-b53c-4ae8-9253-4a35e4510a6f"
 authors = ["okatsn <okatsn@gmail.com> and contributors"]
-version = "0.0.1"
+version = "0.1.0"
 
 [compat]
 julia = "1.10"
