@@ -1,10 +1,10 @@
 module OkErrorHandling
 
 # Write your package code here.
-export @run_pipeline
+export @cli_entrypoint
 
 """
-    @run_pipeline ex
+    @cli_entrypoint ex
 
 Executes expression `ex`.
 - In non-interactive (CLI) mode: Wraps in a try/catch block.
@@ -22,16 +22,16 @@ end
 
 if !isempty(PROGRAM_FILE) && abspath(PROGRAM_FILE) == @__FILE__
     println("Running in CLI mode...")
-    @run_pipeline main()
+    @cli_entrypoint main()
 else
     # --- INTERACTIVE EXECUTION (REPL/VSCode) ---
     println("Running in REPL/interactive mode.")
-    @run_pipeline main()
+    @cli_entrypoint main()
 end
 ```
 
 """
-macro run_pipeline(ex)
+macro cli_entrypoint(ex)
     quote
         if !isinteractive()
             # --- CLI Mode: Add the try...catch ---

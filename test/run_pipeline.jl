@@ -1,11 +1,11 @@
 using Test
 using OkErrorHandling
 
-@testset "@run_pipeline tests" begin
+@testset "@cli_entrypoint tests" begin
 
     @testset "Successful execution" begin
         # Should execute and return normally
-        result = @run_pipeline begin
+        result = @cli_entrypoint begin
             x = 1 + 1
             x * 2
         end
@@ -19,8 +19,8 @@ using OkErrorHandling
         interactive_error_script = """
         using OkErrorHandling
         using Test
-        @test_throws ErrorException @run_pipeline error("test error")
-        @test_throws ArgumentError @run_pipeline throw(ArgumentError("bad arg"))
+        @test_throws ErrorException @cli_entrypoint error("test error")
+        @test_throws ArgumentError @cli_entrypoint throw(ArgumentError("bad arg"))
         println("TESTS_PASSED")
         """
         result = read(pipeline(`julia --startup-file=no -i -e $(interactive_error_script)`), String)
@@ -34,7 +34,7 @@ using OkErrorHandling
         # Test successful execution in non-interactive mode
         script = """
         using OkErrorHandling
-        @run_pipeline begin
+        @cli_entrypoint begin
             println("Success")
         end
         """
@@ -44,7 +44,7 @@ using OkErrorHandling
         # Test error handling with exit code
         error_script = """
         using OkErrorHandling
-        @run_pipeline error("Pipeline failed")
+        @cli_entrypoint error("Pipeline failed")
         """
         proc = run(pipeline(`julia --startup-file=no -e $(error_script)`), wait=false)
         wait(proc)
@@ -53,7 +53,7 @@ using OkErrorHandling
         # Test ArgumentError exit code
         arg_error_script = """
         using OkErrorHandling
-        @run_pipeline throw(ArgumentError("bad argument"))
+        @cli_entrypoint throw(ArgumentError("bad argument"))
         """
         proc = run(pipeline(`julia --startup-file=no -e $(arg_error_script)`), wait=false)
         wait(proc)
@@ -62,7 +62,7 @@ using OkErrorHandling
         # Test InterruptException exit code
         interrupt_script = """
         using OkErrorHandling
-        @run_pipeline throw(InterruptException())
+        @cli_entrypoint throw(InterruptException())
         """
         proc = run(pipeline(`julia --startup-file=no -e $(interrupt_script)`), wait=false)
         wait(proc)
