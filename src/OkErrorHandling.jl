@@ -44,7 +44,20 @@ macro run_pipeline(ex)
                 println(stderr, "Full Julia Stacktrace:\n")
                 Base.showerror(stderr, e, catch_backtrace())
                 println(stderr, "\n" * "="^80)
-                exit(1)
+                if e isa InterruptException
+                    println(stderr, "Cancelled by user.")
+                    exit(130)
+                elseif e isa ArgumentError
+                    println(stderr, "Usage error: $(e.msg)")
+                    exit(2)
+                else
+                    # Customize formatting if you like
+                    println(stderr, "❌ ERROR: Pipeline failed.\n")
+                    Base.showerror(stderr, e, catch_backtrace())
+                    println(stderr)
+                    exit(1)
+                end
+
             end
         else
             # --- Interactive Mode: Run raw ---
